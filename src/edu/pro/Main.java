@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
     private static final String SPACE = " ";
@@ -31,14 +32,11 @@ public class Main {
         Map<String, Integer> wordFrequency = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                line = line.replaceAll(NON_ALPHABETIC_PATTERN, SPACE).toLowerCase(Locale.ROOT);
-                String[] words = line.split(SPACE);
-                for (String word : words) {
-                    if (!word.isEmpty()) {
-                        wordFrequency.put(word, wordFrequency.getOrDefault(word, 0) + 1);
-                    }
+            Scanner scanner;
+            while (br.ready()) {
+                scanner = new Scanner(br.readLine().replaceAll(NON_ALPHABETIC_PATTERN, " ").toLowerCase(Locale.ROOT));
+                while (scanner.hasNext()) {
+                    wordFrequency.put(scanner.next(), wordFrequency.getOrDefault(scanner.next(), 0) + 1);
                 }
             }
         } catch (IOException e) {
