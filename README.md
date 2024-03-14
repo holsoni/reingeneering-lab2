@@ -18,4 +18,4 @@ MEMORY OPTIMIZATION
  
      ПІСЛЯ - ![image](https://github.com/holsoni/reingeneering-lab2/assets/70883268/4874c6a5-4e35-445d-98ad-7abddb448efe)
 
-   як бачимо різниця використання Heap Memory досить велика (поле COMMITED)
+   як бачимо різниця використання Heap Memory досить велика (поле USED)
