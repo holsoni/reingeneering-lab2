@@ -7,7 +7,12 @@ package edu.pro;
     @project   reingeneering-lab2
 */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -24,66 +29,45 @@ public class Main {
     private static final String FILE_PATH = "src/edu/pro/txt/harry.txt";
     private static final int SHOW_LIMIT = 30;
 
-    public static void main(String[] args) throws IOException {
-
+    public static void main(String[] args) {
         LocalDateTime start = LocalDateTime.now();
+        Map<String, Integer> wordFrequency = new HashMap<>();
 
-        String content = cleanText(FILE_PATH);
-
-        String[] words = content.split(SPACE);
-
-        Map<String, Long> wordsAmount = Arrays.stream(words)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        String[] distincts = wordsAmount.entrySet().stream()
-                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
-                .limit(30)
-                .map(entry -> entry.getKey() + EMPTY_STRING + entry.getValue())
-                .toArray(String[]::new);
-
-        //This is another possible way to do this
-
-        /* Arrays.sort(words);
-        StringBuilder distinctString = new StringBuilder(SPACE);
-
-        for (String word : words) {
-            if (!distinctString.toString().contains(word)) {
-                distinctString.append(word).append(SPACE);
-            }
-        }
-
-        String[] distinctWords = distinctString.toString().split(SPACE);
-        int[] freq = new int[distinctWords.length];
-
-        for (int i = 0; i < distinctWords.length ; i++) {
-            int count = 0;
-            for (String word : words) {
-                if (distinctWords[i].equals(word)) {
-                    count++;
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.replaceAll(NON_ALPHABETIC_PATTERN, SPACE).toLowerCase(Locale.ROOT);
+                String[] words = line.split(SPACE);
+                for (String word : words) {
+                    if (!word.isEmpty()) {
+                        wordFrequency.put(word, wordFrequency.getOrDefault(word, 0) + 1);
+                    }
                 }
             }
-            freq[i] = count;
+        } catch (IOException e) {
+            System.err.println("An error occurred while reading the file: " + e.getMessage());
+            e.printStackTrace();
         }
 
-        for (int i = 0; i < distinctWords.length ; i++) { // 5 000
-            distinctWords[i] += SPACE + freq[i];
-        }
+        wordFrequency.entrySet().stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                .forEach(System.out::println);
 
-        Arrays.sort(distinctWords, Comparator.comparing(str
-                -> Integer.valueOf(str.replaceAll(NON_NUMERIC_PATTERN, EMPTY_STRING))));*/
+        MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+        MemoryUsage heapMemoryUsage = memoryBean.getHeapMemoryUsage();
+        MemoryUsage nonHeapMemoryUsage = memoryBean.getNonHeapMemoryUsage();
 
-        for (int i = 0; i < SHOW_LIMIT; i++) {
-            System.out.println(distincts[i]);
-        }
-        LocalDateTime finish = LocalDateTime.now();
+        System.out.println("Heap Memory Usage:");
+        System.out.println("  Init: " + heapMemoryUsage.getInit());
+        System.out.println("  Used: " + heapMemoryUsage.getUsed());
+        System.out.println("  Committed: " + heapMemoryUsage.getCommitted());
+        System.out.println("  Max: " + heapMemoryUsage.getMax());
 
-        System.out.println("------");
-        System.out.println(ChronoUnit.MILLIS.between(start, finish));
-    }
+        System.out.println("\nNon-Heap Memory Usage:");
+        System.out.println("  Init: " + nonHeapMemoryUsage.getInit());
+        System.out.println("  Used: " + nonHeapMemoryUsage.getUsed());
+        System.out.println("  Committed: " + nonHeapMemoryUsage.getCommitted());
+        System.out.println("  Max: " + nonHeapMemoryUsage.getMax());
 
-    private static String cleanText(String url) throws IOException {
-        String content = new String(Files.readAllBytes(Paths.get(url)));
-        content = content.replaceAll(NON_ALPHABETIC_PATTERN, SPACE).toLowerCase(Locale.ROOT);
-        return content;
     }
 }
