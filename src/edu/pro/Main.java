@@ -13,13 +13,10 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class Main {
     private static final String SPACE = " ";
