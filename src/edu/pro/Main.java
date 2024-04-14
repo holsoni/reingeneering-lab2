@@ -5,10 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Locale;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -25,47 +23,20 @@ public class Main {
        // Path path = Paths.get()
         String content = new String(Files.readAllBytes(Paths.get("src/edu/pro/txt/harry.txt")));
 
-        content = content.replaceAll("[^A-Za-z ]"," ").toLowerCase(Locale.ROOT);
+        List<String> words = Arrays.stream(content.split("[^A-Za-z]+"))
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
 
-        String[] words = content.split(" +"); // 400 000
+        words.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(30)
+                .forEach(entry -> System.out.println(entry.getKey() + " " + entry.getValue()));
 
-        Arrays.sort(words);
-
-        String distinctString = " ";
-
-        for (int i = 0; i < words.length ; i++) {
-            if (!distinctString.contains(words[i])){
-                distinctString+= words[i] + " ";
-            }
-        }
-
-        String[] distincts = distinctString.split(" ");
-        int[] freq = new int[distincts.length];
-
-        for (int i = 0; i < distincts.length ; i++) {
-            int count = 0;
-            for (int j = 0; j < words.length ; j++) {
-                if (distincts[i].equals(words[j])) {
-                    count++;
-                }
-            }
-            freq[i] = count;
-        }
-
-        for (int i = 0; i < distincts.length ; i++) { // 5 000
-            distincts[i] += " " + freq[i];
-        }
-
-        Arrays.sort(distincts, Comparator.comparing(str
-                -> Integer.valueOf(str.replaceAll("[^0-9]", ""))));
-
-        for (int i = 0; i < 30; i++) {
-            System.out.println(distincts[distincts.length - 1 - i]);
-        }
         LocalDateTime finish = LocalDateTime.now();
 
         System.out.println("------");
-        System.out.println(ChronoUnit.MILLIS.between(start, finish));
-
+        System.out.println("Time of running: " + ChronoUnit.MILLIS.between(start, finish));
     }
 }
