@@ -25,7 +25,7 @@ public class Main {
 
         List<String> words = Arrays.stream(content.split("[^A-Za-z]+"))
                 .map(String::toLowerCase)
-                .collect(Collectors.toList());
+                .toList();
 
         words.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
